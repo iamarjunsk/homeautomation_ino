@@ -1,0 +1,65 @@
+#include <ESP8266WiFi.h>
+#include <FirebaseArduino.h>
+#define FIREBASE_HOST "home-automation-trojo.firebaseio.com"
+#define FIREBASE_AUTH "6HiIX5K8CHWq73Ed8nXw8GnJo2IfAxr8dKvQM7JO"
+#define WIFI_SSID "Moto G (5s) plus"
+#define WIFI_PASSWORD "sk6@1998"
+int s1;
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+pinMode(D7,OUTPUT);
+digitalWrite(D7,LOW);
+WiFi.begin(WIFI_SSID,WIFI_PASSWORD);
+Serial.print("Connecting");
+while(WiFi.status()!=WL_CONNECTED)
+{
+  Serial.print(".");
+  delay(500);
+}
+Serial.println();
+Serial.print("Connected:");
+Serial.println(WiFi.localIP());
+Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
+}
+void firebaseconnect()
+{
+  Serial.println("CONNECTING");
+Firebase.begin(FIREBASE_HOST,FIREBASE_AUTH);
+//Firebase.set("switch1",0);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if(Firebase.failed())
+  {
+    Serial.print("Failed:");
+    Serial.println(Firebase.error());
+    firebaseconnect();
+    return;
+  }
+  s1=2;
+  s1=Firebase.getInt("switch/switch1");
+  Serial.println(s1);
+  delay(50);
+  
+   if (Firebase.failed()) {
+      Serial.print("setting /message failed:");
+      Serial.println(Firebase.error());  
+      return;
+  }
+  
+  if(s1==1){
+    Serial.println(s1);
+    Serial.println("LED is ON");
+    digitalWrite(D7,LOW);
+    return;
+  }
+ else{
+    Serial.println(s1);
+    Serial.println("LED is OFF");
+    digitalWrite(D7,HIGH);
+    return;
+  }
+  
+}
